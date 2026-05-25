@@ -1,0 +1,20 @@
+# dependencias
+node_modules/
+
+# archivos de entorno (CLAVE)
+.env
+.env.local
+.env.development
+.env.production
+
+# builds
+dist/
+build/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# sistema
+.DS_Store

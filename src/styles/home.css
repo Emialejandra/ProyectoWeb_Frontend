@@ -1,0 +1,90 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Segoe UI', sans-serif;
+  background:#f5f7fb;
+}
+
+.home-container{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:40px;
+  padding:20px 5%;
+}
+
+/* Lado izquierdo */
+.home-left{
+  flex:1;
+  max-width:600px;
+}
+
+.home-left h1{
+  color:#14b8a6;
+  font-size:3.2rem;
+  margin-bottom:8px;
+}
+
+.home-left h2{
+  color:#0f172a;
+  font-size:1.8rem;
+  margin-bottom:15px;
+}
+
+.home-left p{
+  color:#475569;
+  font-size:1.05rem;
+  line-height:1.6;
+  margin-bottom:20px;
+}
+
+/* Imagen */
+.home-image{
+  width:100%;
+  max-width:450px;
+  display:block;
+}
+
+/* Login */
+.home-right{
+  width:420px;
+  flex-shrink:0;
+}
+
+/* Responsive */
+@media(max-width:900px){
+
+  .home-container{
+    flex-direction:column;
+    text-align:center;
+    gap:25px;
+    padding:25px;
+  }
+
+  .home-left{
+    max-width:100%;
+  }
+
+  .home-left h1{
+    font-size:2.5rem;
+  }
+
+  .home-left h2{
+    font-size:1.5rem;
+  }
+
+  .home-image{
+    margin:auto;
+    max-width:320px;
+  }
+
+  .home-right{
+    width:100%;
+    max-width:420px;
+  }
+}

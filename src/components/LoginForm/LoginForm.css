@@ -1,0 +1,164 @@
+/* Contenedor principal */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Título */
+.login-card h2 {
+  text-align: center;
+  color: #0f172a;
+  margin-bottom: 25px;
+  font-size: 2rem;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Inputs */
+.login-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.login-form input:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+}
+
+/* Botón Login */
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background: #14b8a6;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-login:hover {
+  background: #0d9488;
+  transform: translateY(-2px);
+}
+
+/* Recuperar contraseña */
+.forgot-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  text-decoration: none;
+  color: #14b8a6;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Separador */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 22px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dbe2ea;
+}
+
+.divider span {
+  margin: 0 12px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Botón Google */
+.btn-google {
+  width: 100%;
+  padding: 14px;
+  background: white;
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-google:hover {
+  background: #f8fafc;
+}
+
+.btn-google img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Botón Registro */
+.btn-register {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-register:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
+}
+
+/* Mensajes de error */
+.error-message {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-card {
+    max-width: 100%;
+    padding: 25px;
+  }
+
+  .login-card h2 {
+    font-size: 1.7rem;
+  }
+}
