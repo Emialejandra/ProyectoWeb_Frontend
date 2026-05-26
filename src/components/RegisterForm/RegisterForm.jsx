@@ -28,8 +28,15 @@ function RegisterForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validar contraseñas
         if (formData.password !== formData.confirmPassword) {
             alert("Las contraseñas no coinciden");
+            return;
+        }
+
+        // Validar edad mínima
+        if (Number(formData.edad) < 25) {
+            alert("La edad mínima permitida es 25 años");
             return;
         }
 
@@ -40,17 +47,18 @@ function RegisterForm() {
                 password: formData.password,
                 options: {
                     data: {
-                        full_name: `${formData.nombre} ${formData.apellido}`,
-                        edad: formData.edad
+                        first_name: formData.nombre,
+                        last_name: formData.apellido,
+                        age: Number(formData.edad)
                     }
                 }
             });
 
-            console.log("Respuesta Supabase:", data);
-
             if (error) {
                 throw error;
             }
+
+            console.log("Usuario registrado:", data);
 
             alert(
                 "Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta."
@@ -62,10 +70,11 @@ function RegisterForm() {
 
             console.error("Error al crear usuario:", error);
 
-            alert(
-                error.message ||
-                "No fue posible registrar el usuario."
-            );
+            if (error.message.includes("User already registered")) {
+                alert("Ya existe una cuenta registrada con este correo.");
+            } else {
+                alert("No fue posible registrar el usuario.");
+            }
         }
     };
 
@@ -117,6 +126,7 @@ function RegisterForm() {
                     placeholder="Edad"
                     value={formData.edad}
                     onChange={handleChange}
+                    min="25"
                     required
                 />
 

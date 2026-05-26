@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../../services/supabaseClient";
+import { getFriendlyError } from "../../utils/errorMessages";
 
 import "./LoginForm.css";
 
@@ -15,26 +16,51 @@ function LoginForm() {
 
   // Login tradicional
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setError("");
-    setLoading(true);
+  setError("");
+  setLoading(true);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) throw error;
+    if (error) throw error;
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    const profileComplete =
+      profile &&
+      profile.first_name &&
+      profile.last_name &&
+      profile.salary &&
+      profile.categories &&
+      profile.categories.length > 0;
+
+    if (profileComplete) {
       navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
+    } else {
+      navigate("/profile");
     }
 
-    setLoading(false);
-  };
+  } catch (err) {
+  setError(getFriendlyError(err));
+}
+
+  setLoading(false);
+};
 
   // Login con Google
   const handleGoogleLogin = async () => {
@@ -44,8 +70,9 @@ function LoginForm() {
       });
 
       if (error) throw error;
+
     } catch (err) {
-      setError(err.message);
+      setError(getFriendlyError(err));
     }
   };
 
@@ -100,6 +127,7 @@ function LoginForm() {
       </div>
 
       <button
+        type="button"
         className="btn-google"
         onClick={handleGoogleLogin}
       >
@@ -107,13 +135,13 @@ function LoginForm() {
           src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
           alt="Google"
         />
-
         Continuar con Google
       </button>
 
       <button
+        type="button"
         className="btn-register"
-        onClick={() => navigate("/Register")}
+        onClick={() => navigate("/register")}
       >
         Crear cuenta nueva
       </button>
