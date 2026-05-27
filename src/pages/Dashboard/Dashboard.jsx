@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../services/supabaseClient";
 import Profile from "../Profile/Profile";
+import { normalizeUser } from "../../utils/userUtils";
 import "../../styles/dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
@@ -16,50 +18,48 @@ function Dashboard() {
   }, []);
 
   const checkProfile = async () => {
+    setLoading(true);
+
     try {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
+      const rawUser = JSON.parse(localStorage.getItem("user"));
+      const user = normalizeUser(rawUser);
 
       if (!user) {
         navigate("/");
         return;
       }
 
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (!profileData) {
-        navigate("/profile");
-        return;
-      }
-
-      setProfile(profileData);
+      setProfile(user);
 
       const profileComplete =
-        profileData.first_name &&
-        profileData.last_name &&
-        profileData.salary &&
-        Array.isArray(profileData.categories) &&
-        profileData.categories.length > 0;
+        user.first_name?.trim() &&
+        user.last_name?.trim() &&
+        user.salary !== null &&
+        user.salary !== "" &&
+        Array.isArray(user.categories) &&
+        user.categories.length > 0;
+
+      console.log("Perfil:", user);
+      console.log("Completo:", profileComplete);
 
       if (!profileComplete) {
         navigate("/profile");
         return;
       }
 
-      setLoading(false);
     } catch (error) {
       console.error(error);
+
+      localStorage.removeItem("user");
+
       navigate("/");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem("user");
     navigate("/");
   };
 
@@ -71,7 +71,6 @@ function Dashboard() {
     );
   }
 
-  // mostrar categorías del usuario
   const categories = Array.isArray(profile?.categories)
     ? profile.categories
     : [];
@@ -80,9 +79,11 @@ function Dashboard() {
     <div className="dashboard-container">
 
       <div className="dashboard-header">
+
         <h1>Dashboard</h1>
 
         <div className="dashboard-actions">
+
           <button
             className="dashboard-btn btn-profile"
             onClick={() => setShowProfile(true)}
@@ -96,24 +97,29 @@ function Dashboard() {
           >
             Cerrar Sesión
           </button>
+
         </div>
 
       </div>
 
       <div className="dashboard-welcome">
+
         <h2>Bienvenido al Sistema de Control de Gastos</h2>
+
         <p>
           Administra tus finanzas, controla tus gastos y alcanza tus metas de ahorro.
         </p>
+
       </div>
 
       <div className="dashboard-cards">
 
-        {/*  SOLO categorías del usuario */}
         {categories.map((cat, index) => (
           <div className="dashboard-card" key={index}>
             <h3>{cat}</h3>
+
             <div className="card-value">$0.00</div>
+
             <p>Gastos en la categoría {cat}</p>
           </div>
         ))}
@@ -122,6 +128,7 @@ function Dashboard() {
 
       {showProfile && (
         <div className="modal-overlay">
+
           <div className="modal-panel">
 
             <button
@@ -134,12 +141,12 @@ function Dashboard() {
             <Profile />
 
           </div>
+
         </div>
       )}
-      
+
     </div>
   );
-
 }
 
 export default Dashboard;

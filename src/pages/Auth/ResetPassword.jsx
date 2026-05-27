@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { supabase } from "../../services/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import "../../styles/forgot-reset.css";
 
 function ResetPassword() {
+  const navigate = useNavigate();
+
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
-
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -26,49 +29,114 @@ function ResetPassword() {
     }
 
     if (password.length < 6) {
-      setMessage("La contraseña debe tener al menos 6 caracteres");
+      setMessage(
+        "La contraseña debe tener al menos 6 caracteres"
+      );
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({
-      password: password
-    });
+    try {
+      setLoading(true);
 
-    if (error) {
-      setMessage("Error al actualizar la contraseña");
-      return;
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setMessage("Sesión expirada. Inicia sesión nuevamente.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/auth/update-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          "No fue posible actualizar la contraseña"
+        );
+      }
+
+      setMessage("Contraseña actualizada correctamente");
+
+      setPassword("");
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
+
+    } catch (error) {
+      console.error(error);
+
+      setMessage(
+        error.message ||
+        "Error al actualizar la contraseña"
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setMessage("Contraseña actualizada correctamente");
-
-    await supabase.auth.signOut();
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1500);
   };
 
   return (
-  <div className="auth-container">
-    <div className="auth-box">
-      <h2>Cambiar contraseña</h2>
+    <div className="auth-container">
+      <div className="auth-box">
 
-      <form onSubmit={handleUpdatePassword}>
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <h2>Cambiar contraseña</h2>
 
-        <button type="submit">Actualizar contraseña</button>
-      </form>
+        <form onSubmit={handleUpdate}>
 
-      {message && <p className="auth-message">{message}</p>}
+          <input
+            type="password"
+            placeholder="Nueva contraseña"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Confirmar contraseña"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+          >
+            {loading
+              ? "Actualizando..."
+              : "Actualizar contraseña"}
+          </button>
+
+        </form>
+
+        {message && (
+          <p className="auth-message">
+            {message}
+          </p>
+        )}
+
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default ResetPassword;

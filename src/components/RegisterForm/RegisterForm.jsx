@@ -1,195 +1,192 @@
-// src/components/RegisterForm/RegisterForm.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RegisterForm.css";
-import { supabase } from "../../services/supabaseClient";
 
 function RegisterForm() {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-    const [formData, setFormData] = useState({
-        nombre: "",
-        apellido: "",
-        edad: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    edad: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
+  };
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+  // Registro tradicional
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    //registro tradicional
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
 
-        // Validar contraseñas
-        if (formData.password !== formData.confirmPassword) {
-            alert("Las contraseñas no coinciden");
-            return;
+    if (Number(formData.edad) < 25) {
+      alert("La edad mínima permitida es 25 años");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            first_name: formData.nombre,
+            last_name: formData.apellido,
+            age: Number(formData.edad),
+            email: formData.email,
+            password: formData.password
+          })
         }
+      );
 
-        // Validar edad mínima
-        if (Number(formData.edad) < 25) {
-            alert("La edad mínima permitida es 25 años");
-            return;
-        }
+      const data = await response.json();
 
-        try {
+      if (!response.ok) {
+        throw new Error(
+          data.message || "No fue posible registrar el usuario"
+        );
+      }
 
-            const { data, error } = await supabase.auth.signUp({
-                email: formData.email,
-                password: formData.password,
-                options: {
-                    data: {
-                        first_name: formData.nombre,
-                        last_name: formData.apellido,
-                        age: Number(formData.edad)
-                    }
-                }
-            });
+      console.log("Usuario registrado:", data);
 
-            if (error) {
-                throw error;
-            }
+      alert(
+        "Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta."
+      );
 
-            console.log("Usuario registrado:", data);
+      navigate("/");
 
-            alert(
-                "Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta."
-            );
+    } catch (error) {
+      console.error(error);
 
-            navigate("/");
+      alert(
+        error.message ||
+        "No fue posible registrar el usuario."
+      );
+    }
+  };
 
-        } catch (error) {
+  // Login con Google mediante backend
+  const handleGoogleLogin = () => {
+    window.location.href =
+      `${API_URL}/api/auth/google`;
+  };
 
-            console.error("Error al crear usuario:", error);
+  return (
+    <div className="register-card">
 
-            if (error.message.includes("User already registered")) {
-                alert("Ya existe una cuenta registrada con este correo.");
-            } else {
-                alert("No fue posible registrar el usuario.");
-            }
-        }
-    };
+      <h2>Crear Cuenta</h2>
 
-    //registro con Google
-    const handleGoogleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        });
-        if (error) {
-            alert(
-                error.message ||
-                "No fue posible iniciar sesión con Google."
-            );
-        }
-    };
+      <form
+        className="register-form"
+        onSubmit={handleSubmit}
+      >
 
-    return (
-        <div className="register-card">
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          required
+        />
 
-            <h2>Crear Cuenta</h2>
+        <input
+          type="text"
+          name="apellido"
+          placeholder="Apellido"
+          value={formData.apellido}
+          onChange={handleChange}
+          required
+        />
 
-            <form className="register-form"
-                onSubmit={handleSubmit}>
+        <input
+          type="number"
+          name="edad"
+          placeholder="Edad"
+          value={formData.edad}
+          onChange={handleChange}
+          min="25"
+          required
+        />
 
-                <input
-                    type="text"
-                    name="nombre"
-                    placeholder="Nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    required
-                />
+        <input
+          type="email"
+          name="email"
+          placeholder="Correo electrónico"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
 
-                <input
-                    type="text"
-                    name="apellido"
-                    placeholder="Apellido"
-                    value={formData.apellido}
-                    onChange={handleChange}
-                    required
-                />
+        <input
+          type="password"
+          name="password"
+          placeholder="Contraseña"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
 
-                <input
-                    type="number"
-                    name="edad"
-                    placeholder="Edad"
-                    value={formData.edad}
-                    onChange={handleChange}
-                    min="25"
-                    required
-                />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirmar contraseña"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+        />
 
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Correo electrónico"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                />
+        <button
+          type="submit"
+          className="btn-register"
+        >
+          Registrarse
+        </button>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Contraseña"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
+        <button
+          type="button"
+          className="btn-google"
+          onClick={handleGoogleLogin}
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+          />
+          Continuar con Google
+        </button>
 
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Confirmar contraseña"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                />
+      </form>
 
-                <button
-                    type="submit"
-                    className="btn-register"
-                >
-                    Registrarse
-                </button>
+      <p className="login-text">
+        ¿Ya tienes cuenta?
 
-                <button type="button"
-                    className="btn-google"
-                    onClick={handleGoogleLogin}
-                >
-                    <img
-                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                        alt="Google"
-                    />
-                    Continuar con Google
-                </button>
+        <button
+          type="button"
+          className="login-link"
+          onClick={() => navigate("/")}
+        >
+          Iniciar sesión
+        </button>
+      </p>
 
-            </form>
-
-            <p className="login-text">
-                ¿Ya tienes cuenta?
-
-                <button
-                    className="login-link"
-                    onClick={() => navigate("/")}
-                >
-                    Iniciar sesión
-                </button>
-            </p>
-
-        </div>
-    );
+    </div>
+  );
 }
 
 export default RegisterForm;

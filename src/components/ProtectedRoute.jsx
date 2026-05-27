@@ -1,29 +1,10 @@
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "../services/supabaseClient";
 
 function ProtectedRoute({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
 
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      setUser(user);
-      setLoading(false);
-    };
-
-    getUser();
-  }, []);
-
-  if (loading) {
-    return <p>Cargando...</p>;
-  }
-
-  if (!user) {
+  if (!token && !user) {
     return <Navigate to="/" replace />;
   }
 
