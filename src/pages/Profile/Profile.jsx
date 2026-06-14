@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { normalizeUser } from "../../utils/userUtils";
+import { getFriendlyError } from "../../utils/errorMessages";
 import "../../styles/profile.css";
 
 function Profile() {
@@ -20,7 +21,11 @@ function Profile() {
   ];
 
   const [loading, setLoading] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [email, setEmail] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [profile, setProfile] = useState({
     first_name: "",
@@ -58,12 +63,12 @@ function Profile() {
 
   const loadProfile = async () => {
     setLoading(true);
+    setErrorMessage("");
 
     try {
       const token = getToken();
       const user = getUser();
 
-      //  salir si no existe absolutamente nada
       if (!token && !user) {
         navigate("/");
         return;
@@ -71,7 +76,6 @@ function Profile() {
 
       if (!token && user) {
         setEmail(user.email || "");
-
         setProfile({
           first_name: user.first_name || "",
           last_name: user.last_name || "",
@@ -81,7 +85,6 @@ function Profile() {
           pets_count: user.pets_count || "",
           categories: user.categories || []
         });
-
         setLoading(false);
         return;
       }
@@ -95,13 +98,11 @@ function Profile() {
       });
 
       const data = await response.json();
+      const profileData = normalizeUser(data?.user || data);
 
       if (!response.ok) {
-        console.warn("Profile API falló, usando user local");
-
         if (user) {
           setEmail(user.email || "");
-
           setProfile({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -111,30 +112,26 @@ function Profile() {
             pets_count: user.pets_count || "",
             categories: user.categories || []
           });
-
           setLoading(false);
           return;
         }
-
-        throw new Error(data.message || "No fue posible obtener el perfil");
+        throw new Error(data.message || "No fue posible obtener el perfil.");
       }
 
-      setEmail(data.email || user?.email || "");
-
+      setEmail(profileData.email || user?.email || "");
       setProfile({
-        first_name: data.first_name || "",
-        last_name: data.last_name || "",
-        age: data.age || "",
-        salary: data.salary || "",
-        children_count: data.children_count || "",
-        pets_count: data.pets_count || "",
-        categories: data.categories || []
+        first_name: profileData.first_name || "",
+        last_name: profileData.last_name || "",
+        age: profileData.age || "",
+        salary: profileData.salary || "",
+        children_count: profileData.children_count || "",
+        pets_count: profileData.pets_count || "",
+        categories: profileData.categories || []
       });
 
     } catch (error) {
       console.error("ERROR PROFILE:", error);
-
-      setLoading(false);
+      setErrorMessage(getFriendlyError(error.message));
     } finally {
       setLoading(false);
     }
@@ -158,27 +155,31 @@ function Profile() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
 
     if (Number(profile.age) < 25) {
-      alert("La edad mínima es 25 años");
+      setErrorMessage("La edad mínima permitida es 25 años.");
       return;
     }
 
     if (!profile.salary || Number(profile.salary) < 0) {
-      alert("Sueldo inválido");
+      setErrorMessage("El sueldo debe ser un valor válido.");
       return;
     }
 
     if (profile.categories.length === 0) {
-      alert("Selecciona al menos una categoría");
+      setErrorMessage("Debes seleccionar al menos una categoría.");
       return;
     }
+
+    setSavingProfile(true);
 
     try {
       const token = getToken();
 
       if (!token) {
-        alert("Sesión expirada");
+        setErrorMessage("Sesión expirada. Inicia sesión nuevamente.");
         logout();
         return;
       }
@@ -201,7 +202,7 @@ function Profile() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Error al actualizar perfil");
+        throw new Error(data.message || "Error al actualizar perfil.");
       }
 
       const user = getUser();
@@ -216,36 +217,45 @@ function Profile() {
         );
       }
 
-      alert("Perfil actualizado correctamente");
-      navigate("/dashboard");
+      setSuccessMessage("Perfil actualizado correctamente.");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
 
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      setErrorMessage(getFriendlyError(error.message));
+    } finally {
+      setSavingProfile(false);
     }
   };
 
   const handleChangePassword = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!newPassword || !confirmPassword) {
-      alert("Completa ambos campos");
+      setErrorMessage("Completa ambos campos.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      setErrorMessage("Las contraseñas no coinciden.");
       return;
     }
 
     if (newPassword.length < 6) {
-      alert("Mínimo 6 caracteres");
+      setErrorMessage("La contraseña debe tener mínimo 6 caracteres.");
       return;
     }
+
+    setChangingPassword(true);
 
     try {
       const token = getToken();
 
       if (!token) {
-        alert("Sesión expirada");
+        setErrorMessage("Sesión expirada. Inicia sesión nuevamente.");
         logout();
         return;
       }
@@ -264,17 +274,18 @@ function Profile() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Error al cambiar contraseña");
+        throw new Error(data.message || "Error al cambiar contraseña.");
       }
 
-      alert("Contraseña actualizada");
-
+      setSuccessMessage("Contraseña actualizada correctamente.");
       setNewPassword("");
       setConfirmPassword("");
 
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      setErrorMessage(getFriendlyError(error.message));
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -290,6 +301,18 @@ function Profile() {
     <div className="profile-container">
 
       <h1>Mi Perfil</h1>
+
+      {successMessage && (
+        <div className="success-message">
+          {successMessage}
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="error-message">
+          {errorMessage}
+        </div>
+      )}
 
       <form onSubmit={handleSave}>
 
@@ -364,8 +387,8 @@ function Profile() {
           </label>
         ))}
 
-        <button type="submit">
-          Guardar
+        <button type="submit" disabled={savingProfile}>
+          {savingProfile ? "Guardando..." : "Guardar"}
         </button>
 
       </form>
@@ -388,8 +411,8 @@ function Profile() {
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
 
-      <button onClick={handleChangePassword}>
-        Actualizar contraseña
+      <button onClick={handleChangePassword} disabled={changingPassword}>
+        {changingPassword ? "Actualizando..." : "Actualizar contraseña"}
       </button>
 
     </div>

@@ -5,7 +5,7 @@ import Register from "../pages/Register/Register";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Profile from "../pages/Profile/Profile";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
-import ResetPassword from "../pages/Auth/ResetPassword";
+import ResetPassword from "../pages/Auth/UpdatePassword";
 
 function AppRoutes() {
 
@@ -38,8 +38,8 @@ function AppRoutes() {
       />
 
       <Route
-        path="/reset-password"
-        element={<ResetPassword />}
+        path="/update-password"
+        element={<UpdatePassword />}
       />
 
     </Routes>

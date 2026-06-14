@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getFriendlyError } from "../../utils/errorMessages";
 import "./RegisterForm.css";
 
 function RegisterForm() {
@@ -16,6 +17,9 @@ function RegisterForm() {
     confirmPassword: ""
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,16 +30,24 @@ function RegisterForm() {
   // Registro tradicional
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
     if (Number(formData.edad) < 25) {
-      alert("La edad mínima permitida es 25 años");
+      setError("La edad mínima permitida es 25 años.");
       return;
     }
+
+    if (formData.password.length < 8) {
+      setError("La contraseña debe tener mínimo 8 caracteres.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -50,7 +62,8 @@ function RegisterForm() {
             last_name: formData.apellido,
             age: Number(formData.edad),
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            password_confirmation: formData.confirmPassword
           })
         }
       );
@@ -59,11 +72,19 @@ function RegisterForm() {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "No fue posible registrar el usuario"
+          data.message || "No fue posible registrar el usuario."
         );
       }
 
-      console.log("Usuario registrado:", data);
+      setError("");
+      setFormData({
+        nombre: "",
+        apellido: "",
+        edad: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+      });
 
       alert(
         "Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta."
@@ -71,13 +92,11 @@ function RegisterForm() {
 
       navigate("/");
 
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        error.message ||
-        "No fue posible registrar el usuario."
-      );
+    } catch (err) {
+      console.error(err);
+      setError(getFriendlyError(err.message || err));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +110,12 @@ function RegisterForm() {
     <div className="register-card">
 
       <h2>Crear Cuenta</h2>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
 
       <form
         className="register-form"
@@ -155,14 +180,16 @@ function RegisterForm() {
         <button
           type="submit"
           className="btn-register"
+          disabled={loading}
         >
-          Registrarse
+          {loading ? "Registrando..." : "Registrarse"}
         </button>
 
         <button
           type="button"
           className="btn-google"
           onClick={handleGoogleLogin}
+          disabled={loading}
         >
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"

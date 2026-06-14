@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Profile from "./pages/Profile/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
-import ResetPassword from "./pages/Auth/ResetPassword";
+import UpdatePassword from "./pages/Auth/UpdatePassword";
 
 function App() {
   return (
@@ -39,8 +39,8 @@ function App() {
         />
         
         <Route
-          path="/reset-password"
-          element={<ResetPassword />}
+          path="/update-password"
+          element={<UpdatePassword />}
         />
         
       </Routes>

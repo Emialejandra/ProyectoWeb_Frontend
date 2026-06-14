@@ -1,99 +1,130 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { getFriendlyError } from "../../utils/errorMessages";
+import { supabase } from "../../services/supabaseClient";
+
 import "../../styles/forgot-reset.css";
 
 function ResetPassword() {
-  const navigate = useNavigate();
 
-  const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleUpdate = async (e) => {
+
     e.preventDefault();
 
     setMessage("");
+    setMessageType("");
+
+    // VALIDACIONES
 
     if (!password || !confirmPassword) {
-      setMessage("Completa todos los campos");
+
+      setMessageType("error");
+      setMessage("Completa todos los campos.");
+
       return;
+
     }
 
     if (password !== confirmPassword) {
-      setMessage("Las contraseñas no coinciden");
+
+      setMessageType("error");
+      setMessage("Las contraseñas no coinciden.");
+
       return;
+
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
+
+      setMessageType("error");
+
       setMessage(
-        "La contraseña debe tener al menos 6 caracteres"
+        "La contraseña debe tener mínimo 8 caracteres."
       );
+
       return;
+
     }
+
+    setLoading(true);
 
     try {
-      setLoading(true);
 
-      const token = localStorage.getItem("token");
+      // ACTUALIZAR PASSWORD EN SUPABASE
 
-      if (!token) {
-        setMessage("Sesión expirada. Inicia sesión nuevamente.");
-        return;
+      const { error } = await supabase.auth.updateUser({
+
+        password
+
+      });
+
+      // ERROR
+
+      if (error) {
+
+        throw new Error(error.message);
+
       }
 
-      const response = await fetch(
-        `${API_URL}/api/auth/update-password`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            password
-          })
-        }
+      // ÉXITO
+
+      setMessageType("success");
+
+      setMessage(
+        "Contraseña actualizada correctamente."
       );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-          "No fue posible actualizar la contraseña"
-        );
-      }
-
-      setMessage("Contraseña actualizada correctamente");
 
       setPassword("");
       setConfirmPassword("");
 
+      // REDIRECCIÓN
+
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
+
+        navigate("/");
+
+      }, 2000);
 
     } catch (error) {
+
       console.error(error);
 
+      setMessageType("error");
+
       setMessage(
-        error.message ||
-        "Error al actualizar la contraseña"
+
+        getFriendlyError(
+          error.message || error
+        )
+
       );
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
   return (
+
     <div className="auth-container">
+
       <div className="auth-box">
 
-        <h2>Cambiar contraseña</h2>
+        <h2>Cambiar Contraseña</h2>
 
         <form onSubmit={handleUpdate}>
 
@@ -129,14 +160,22 @@ function ResetPassword() {
         </form>
 
         {message && (
-          <p className="auth-message">
+
+          <p className={`auth-message ${messageType}`}>
+
             {message}
+
           </p>
+
         )}
 
       </div>
+
     </div>
+
   );
+
 }
 
 export default ResetPassword;
+

@@ -16,6 +16,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [tokenDebug, setTokenDebug] = useState("");
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -23,7 +25,6 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      // LOGIN
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -40,38 +41,36 @@ function LoginForm() {
         throw new Error(data.message || "Credenciales inválidas");
       }
 
+      //  USUARIO REAL (evita errores de estructura)
+      const rawUser = data?.user || data?.data?.user || data?.data || null;
 
-      // USUARIO DIRECTO 
-      const user =
-        data?.user ||
-        data?.data?.user ||
-        data;
-
-      if (!user) {
+      if (!rawUser) {
         throw new Error("No se recibió usuario del backend");
       }
 
-      const normalizedUser = normalizeUser(user);
+      const normalizedUser = normalizeUser(rawUser);
 
-      // TOKEN
+      // TOKEN (soporta múltiples backends)
       const token =
         data?.token ||
         data?.data?.token ||
-        data?.data?.session?.access_token ||
+        data?.accessToken ||
+        data?.jwt ||
         data?.session?.access_token ||
+        data?.data?.session?.access_token ||
         null;
 
       if (token) {
         localStorage.setItem("token", token);
+        setTokenDebug(token);
+      } else {
+        console.warn("Login sin token (permitido en tu sistema)");
       }
 
-      // Guardar usuario normalizado
-      localStorage.setItem(
-        "user",
-        JSON.stringify(normalizedUser || user)
-      );
+      //  GUARDAR USER CORRECTO (SIN DUPLICAR VARIABLES)
+      localStorage.setItem("user", JSON.stringify(normalizedUser));
 
-      // VALIDACIÓN PERFIL
+      //  VALIDACIÓN PERFIL COMPLETO
       const profileComplete =
         normalizedUser?.first_name?.trim() &&
         normalizedUser?.last_name?.trim() &&
@@ -80,8 +79,7 @@ function LoginForm() {
         Array.isArray(normalizedUser?.categories) &&
         normalizedUser.categories.length > 0;
 
-
-      // REDIRECCIÓN
+      //  REDIRECCIÓN CONTROLADA
       navigate(profileComplete ? "/dashboard" : "/profile");
 
     } catch (err) {
@@ -129,6 +127,19 @@ function LoginForm() {
         </button>
       </form>
 
+      {/* DEBUG TOKEN */}
+      {tokenDebug && (
+        <div className="token-box">
+          <h4>Token de login</h4>
+          <textarea
+            readOnly
+            value={tokenDebug}
+            rows={4}
+            style={{ width: "100%", fontSize: "12px" }}
+          />
+        </div>
+      )}
+
       <Link to="/forgot-password" className="forgot-link">
         ¿Olvidaste tu contraseña?
       </Link>
@@ -141,6 +152,7 @@ function LoginForm() {
         type="button"
         className="btn-google"
         onClick={handleGoogleLogin}
+        disabled={loading}
       >
         <img
           src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -153,6 +165,7 @@ function LoginForm() {
         type="button"
         className="btn-register"
         onClick={() => navigate("/register")}
+        disabled={loading}
       >
         Crear cuenta nueva
       </button>
