@@ -32,8 +32,6 @@ frontendAPP/
 ├── public/
 ├── src/
 │   ├── assets/
-│   │   └── dash.webp
-│   │
 │   ├── components/
 │   │   ├── Login/
 │   │   │   ├── LoginForm.jsx
@@ -51,6 +49,8 @@ frontendAPP/
 │   │   │   └── Dashboard.jsx
 │   │   ├── Home/
 │   │   │   └── Home.jsx
+│   │   ├── Landing/
+│   │   │   └── Landing.jsx
 │   │   ├── Profile/
 │   │   │   └── Profile.jsx
 │   │   └── Register/
@@ -68,6 +68,7 @@ frontendAPP/
 │   │   ├── dashboard.css
 │   │   ├── forgot-reset.css
 │   │   ├── home.css
+│   │   ├── landing.css
 │   │   ├── profile.css
 │   │   └── register.css
 │   │
@@ -149,7 +150,7 @@ npm run dev
 | Método | Ruta               | Descripción                 |
 | ------ | ------------------ | --------------------------- |
 | POST   | `/register`        | Registro de usuarios        |
-| POST   | `/`                | Inicio de sesión            |
+| POST   | `/home`            | Inicio de sesión            |
 | POST   | `/forgot-password` | Recuperación de contraseña  |
 | PUT    | `/update-password` | Actualización de contraseña |
 | PUT    | `/profile`         | Actualización de perfil     |
