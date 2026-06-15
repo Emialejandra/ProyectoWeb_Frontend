@@ -5,7 +5,8 @@ import Register from "../pages/Register/Register";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Profile from "../pages/Profile/Profile";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
-import ResetPassword from "../pages/Auth/UpdatePassword";
+import UpdatePassword from "../pages/Auth/UpdatePassword";
+import Landing from "../pages/Landing/Landing";
 
 function AppRoutes() {
 
@@ -13,7 +14,7 @@ function AppRoutes() {
     <Routes>
 
       <Route
-        path="/"
+        path="/home"
         element={<Home />}
       />
 
@@ -40,6 +41,11 @@ function AppRoutes() {
       <Route
         path="/update-password"
         element={<UpdatePassword />}
+      />
+
+      <Route
+        path="/"
+        element={<Landing />}
       />
 
     </Routes>
