@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { normalizeUser } from "../../utils/userUtils";
 import { getFriendlyError } from "../../utils/errorMessages";
 import "../../styles/profile.css";
+// IMPORTAMOS LOS ICONOS PARA EL OJO
+import { Eye, EyeOff } from "lucide-react";
 
-function Profile() {
+function Profile({ onClose }) {
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
@@ -39,6 +41,10 @@ function Profile() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // NUEVOS ESTADOS PARA MOSTRAR/OCULTAR CONTRASEÑAS
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -79,10 +85,10 @@ function Profile() {
         setProfile({
           first_name: user.first_name || "",
           last_name: user.last_name || "",
-          age: user.age || "",
-          salary: user.salary || "",
-          children_count: user.children_count || "",
-          pets_count: user.pets_count || "",
+          age: user.age ?? "",
+          salary: user.salary ?? "",
+          children_count: user.children_count ?? "",
+          pets_count: user.pets_count ?? "",
           categories: user.categories || []
         });
         setLoading(false);
@@ -98,7 +104,10 @@ function Profile() {
       });
 
       const data = await response.json();
-      const profileData = normalizeUser(data?.user || data);
+      const profileData = {
+        ...normalizeUser(data?.user || {}),
+        ...(data?.profile || {})
+      };
 
       if (!response.ok) {
         if (user) {
@@ -106,10 +115,10 @@ function Profile() {
           setProfile({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
-            age: user.age || "",
-            salary: user.salary || "",
-            children_count: user.children_count || "",
-            pets_count: user.pets_count || "",
+            age: user.age ?? "",
+            salary: user.salary ?? "",
+            children_count: user.children_count ?? "",
+            pets_count: user.pets_count ?? "",
             categories: user.categories || []
           });
           setLoading(false);
@@ -122,13 +131,12 @@ function Profile() {
       setProfile({
         first_name: profileData.first_name || "",
         last_name: profileData.last_name || "",
-        age: profileData.age || "",
-        salary: profileData.salary || "",
-        children_count: profileData.children_count || "",
-        pets_count: profileData.pets_count || "",
+        age: profileData.age ?? "",
+        salary: profileData.salary ?? "",
+        children_count: profileData.children_count ?? "",
+        pets_count: profileData.pets_count ?? "",
         categories: profileData.categories || []
       });
-
     } catch (error) {
       console.error("ERROR PROFILE:", error);
       setErrorMessage(getFriendlyError(error.message));
@@ -165,6 +173,16 @@ function Profile() {
 
     if (!profile.salary || Number(profile.salary) < 0) {
       setErrorMessage("El sueldo debe ser un valor válido.");
+      return;
+    }
+
+    if (Number(profile.children_count) < 0) {
+      setErrorMessage("La cantidad de hijos no puede ser negativa.");
+      return;
+    }
+
+    if (Number(profile.pets_count) < 0) {
+      setErrorMessage("La cantidad de mascotas no puede ser negativa.");
       return;
     }
 
@@ -212,14 +230,20 @@ function Profile() {
           "user",
           JSON.stringify({
             ...user,
-            ...profile
+            ...(data.profile || data.data || profile)
           })
         );
       }
 
       setSuccessMessage("Perfil actualizado correctamente.");
+      await loadProfile();
+
       setTimeout(() => {
-        navigate("/dashboard");
+        if (onClose) {
+          onClose(); // cierra el modal y actualiza el dashboard
+        } else {
+          navigate("/dashboardUser");
+        }
       }, 1500);
 
     } catch (error) {
@@ -229,6 +253,10 @@ function Profile() {
       setSavingProfile(false);
     }
   };
+
+  //caracteres especiales en la contraseña 
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-])[A-Za-z\d@$!%*?&.#_\-]{8,}$/;
 
   const handleChangePassword = async () => {
     setErrorMessage("");
@@ -244,8 +272,10 @@ function Profile() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setErrorMessage("La contraseña debe tener mínimo 6 caracteres.");
+    if (!passwordRegex.test(newPassword)) {
+      setErrorMessage(
+        "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial."
+      );
       return;
     }
 
@@ -299,23 +329,12 @@ function Profile() {
 
   return (
     <div className="profile-container">
-
       <h1>Mi Perfil</h1>
 
-      {successMessage && (
-        <div className="success-message">
-          {successMessage}
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="error-message">
-          {errorMessage}
-        </div>
-      )}
+      {successMessage && <div className="toast-success">{successMessage}</div>}
+      {errorMessage && <div className="toast-error">{errorMessage}</div>}
 
       <form onSubmit={handleSave}>
-
         <h2>Información Personal</h2>
 
         <input
@@ -334,11 +353,7 @@ function Profile() {
           onChange={handleChange}
         />
 
-        <input
-          type="email"
-          value={email}
-          disabled
-        />
+        <input type="email" value={email} disabled />
 
         <input
           type="number"
@@ -350,71 +365,101 @@ function Profile() {
 
         <h2>Información Financiera</h2>
 
+        <p>Sueldo</p>
         <input
           type="number"
           name="salary"
           placeholder="Sueldo"
+          min="250"
           value={profile.salary}
           onChange={handleChange}
         />
-
+        <p>Hijos</p>
         <input
           type="number"
           name="children_count"
           placeholder="Hijos"
+          min="0"
           value={profile.children_count}
           onChange={handleChange}
         />
-
+        <p>Mascotas</p>
         <input
           type="number"
           name="pets_count"
           placeholder="Mascotas"
+          min="0"
           value={profile.pets_count}
           onChange={handleChange}
         />
 
         <h2>Categorías</h2>
-
-        {categoriesList.map((category) => (
-          <label key={category}>
-            <input
-              type="checkbox"
-              checked={profile.categories.includes(category)}
-              onChange={() => handleCategoryChange(category)}
-            />
-            {category}
-          </label>
-        ))}
+        <div className="categories-container">
+          {categoriesList.map((category) => (
+            <label key={category} className="category-item">
+              <input
+                type="checkbox"
+                checked={(profile.categories || []).includes(category)}
+                onChange={() => handleCategoryChange(category)}
+              />
+              {category}
+            </label>
+          ))}
+        </div>
 
         <button type="submit" disabled={savingProfile}>
           {savingProfile ? "Guardando..." : "Guardar"}
         </button>
-
       </form>
 
       <hr />
 
       <h2>Cambiar contraseña</h2>
 
-      <input
-        type="password"
-        placeholder="Nueva contraseña"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
+      <small className="password-hint">
+        La contraseña debe contener al menos 8 caracteres,
+        una letra mayúscula, un número y un carácter especial.
+      </small>
 
-      <input
-        type="password"
-        placeholder="Confirmar contraseña"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
+      <div className="password-section">
+        {/* NUEVA CONTRASEÑA CON OJO */}
+        <div className="password-container">
+          <input
+            type={showNewPassword ? "text" : "password"}
+            placeholder="Nueva contraseña"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowNewPassword(!showNewPassword)}
+          >
+            {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
-      <button onClick={handleChangePassword} disabled={changingPassword}>
-        {changingPassword ? "Actualizando..." : "Actualizar contraseña"}
-      </button>
+        {/* CONFIRMAR CONTRASEÑA CON OJO */}
+        <div className="password-container">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirmar contraseña"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
+        <button onClick={handleChangePassword} disabled={changingPassword}>
+          {changingPassword ? "Actualizando..." : "Actualizar contraseña"}
+        </button>
+      </div>
     </div>
   );
 }

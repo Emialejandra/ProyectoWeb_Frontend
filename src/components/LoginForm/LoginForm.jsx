@@ -3,19 +3,20 @@ import { useNavigate, Link } from "react-router-dom";
 import { getFriendlyError } from "../../utils/errorMessages";
 import { normalizeUser } from "../../utils/userUtils";
 
+import { Eye, EyeOff } from "lucide-react";
 import "./LoginForm.css";
 
 function LoginForm() {
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [tokenDebug, setTokenDebug] = useState("");
 
   const handleLogin = async (e) => {
@@ -28,49 +29,53 @@ function LoginForm() {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       console.log("LOGIN RESPONSE:", data);
 
+
       if (!response.ok) {
         throw new Error(data.message || "Credenciales inválidas");
       }
 
-      //  USUARIO REAL (evita errores de estructura)
-      const rawUser = data?.user || data?.data?.user || data?.data || null;
+      const rawUser = data?.data?.profile;
 
       if (!rawUser) {
         throw new Error("No se recibió usuario del backend");
       }
 
-      const normalizedUser = normalizeUser(rawUser);
+      // ASEGURAR ROLE 
+      const role = rawUser.role || "user";
 
-      // TOKEN (soporta múltiples backends)
-      const token =
-        data?.token ||
-        data?.data?.token ||
-        data?.accessToken ||
-        data?.jwt ||
-        data?.session?.access_token ||
-        data?.data?.session?.access_token ||
-        null;
+      // NORMALIZAR USUARIO
+      const normalizedUser = normalizeUser(rawUser);
+      normalizedUser.role = role;
+      console.log("USER FINAL:", normalizedUser);
+
+      // TOKEN
+      const token = data?.data?.session?.access_token || null;
 
       if (token) {
         localStorage.setItem("token", token);
-        setTokenDebug(token);
-      } else {
-        console.warn("Login sin token (permitido en tu sistema)");
       }
 
-      //  GUARDAR USER CORRECTO (SIN DUPLICAR VARIABLES)
+      // GUARDAR USER
       localStorage.setItem("user", JSON.stringify(normalizedUser));
 
-      //  VALIDACIÓN PERFIL COMPLETO
+      // REDIRECCIÓN POR ROL
+      if (role === "admin") {
+        navigate("/admin-test");
+        return;
+      }
+
+      navigate("/dashboardUser");
+
+      // VALIDACIÓN PERFIL
       const profileComplete =
         normalizedUser?.first_name?.trim() &&
         normalizedUser?.last_name?.trim() &&
@@ -79,9 +84,15 @@ function LoginForm() {
         Array.isArray(normalizedUser?.categories) &&
         normalizedUser.categories.length > 0;
 
-      //  REDIRECCIÓN CONTROLADA
-      navigate(profileComplete ? "/dashboard" : "/profile");
-
+      if (profileComplete) {
+        navigate("/dashboardUser");
+      } else {
+        navigate("/profile", {
+          state: {
+            message: "Completa tu perfil para poder continuar.",
+          },
+        });
+      }
     } catch (err) {
       console.error(err);
       setError(getFriendlyError(err.message || err));
@@ -90,20 +101,33 @@ function LoginForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/api/auth/google`;
+
+  const handleGoogleLogin = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/google`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Error Google Login:", error);
+    }
   };
 
   return (
-    <div className="login-card">
-
+    <>
       <h2>Iniciar Sesión</h2>
 
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-message">{error}</div>}
 
       <form className="login-form" onSubmit={handleLogin}>
         <input
@@ -114,20 +138,29 @@ function LoginForm() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="password-container">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         <button type="submit" className="btn-login" disabled={loading}>
           {loading ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
 
-      {/* DEBUG TOKEN */}
       {tokenDebug && (
         <div className="token-box">
           <h4>Token de login</h4>
@@ -169,8 +202,7 @@ function LoginForm() {
       >
         Crear cuenta nueva
       </button>
-
-    </div>
+    </>
   );
 }
 

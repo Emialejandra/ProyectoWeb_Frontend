@@ -162,3 +162,44 @@
     font-size: 1.7rem;
   }
 }
+
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+/* input dentro del contenedor */
+.password-container input {
+  width: 100%;
+  padding-right: 45px; /* espacio para el ojo */
+  box-sizing: border-box;
+}
+
+/* botón del ojo */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #666; /* color del ícono */
+  padding: 4px;
+}
+
+/* efecto hover */
+.toggle-password:hover {
+  color: #007bff;
+}
+
+/* opcional: evita outline feo al hacer click */
+.toggle-password:focus {
+  outline: none;
+}

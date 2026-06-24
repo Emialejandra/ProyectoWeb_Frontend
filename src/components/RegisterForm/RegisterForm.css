@@ -11,6 +11,16 @@
   color:#0f172a;
 }
 
+.register-card h3{
+  text-align:center;
+  margin-bottom:25px;
+  color:#0f172a;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  border-left: 5px solid #14b8a6;
+  padding-left: 12px;
+}
+
 .register-form{
   display:flex;
   flex-direction:column;
@@ -54,4 +64,151 @@
   color:#14b8a6;
   cursor:pointer;
   font-weight:600;
+}
+
+/*Visualizar contrseña */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  color: #007bff;
+}
+
+.password-hint {
+  display: block;
+  margin-top: -10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* notificaciones globales */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999; 
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  width: calc(100% - 40px); 
+}
+
+/*estilo toast */
+.toast-notification {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  
+  /* Animación de entrada por la derecha */
+  animation: slideInRight 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* alerta de error */
+.toast-notification.toast-error {
+  border-left: 5px solid #ef4444;
+  color: #e7ebf2;
+}
+.toast-notification.toast-error .toast-icon {
+  color: #f29090;
+}
+
+/* alerta de éxito */
+.toast-notification.toast-success {
+  border-left: 5px solid #10b981;
+  color: #e7ebf2;
+}
+.toast-notification.toast-success .toast-icon {
+  color: #10b981;
+}
+
+/* ELEMENTOS INTERNOS*/
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.toast-icon {
+  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Botón de cerrar elegante en la esquina */
+.btn-toast-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-toast-close:hover {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* animacion fluida*/
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOutToast {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+.toast-notification.hide {
+  animation: fadeOutToast 0.3s ease forwards;
 }

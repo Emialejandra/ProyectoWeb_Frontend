@@ -2,23 +2,29 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home/Home";
 import Register from "./pages/Register/Register";
-import Dashboard from "./pages/Dashboard/Dashboard";
+import DashboardUser from "./pages/Dashboard/DashboardUser";
 import Profile from "./pages/Profile/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import UpdatePassword from "./pages/Auth/UpdatePassword";
 import Landing from "./pages/Landing/Landing";
+import DashboardAdmin from "./pages/Dashboard/DashboardAdmin";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* LANDING / HOME */}
         <Route path="/" element={<Landing />} />
-
         <Route path="/home" element={<Home />} />
-        
-        <Route path="/register" element={<Register />} />
 
+        {/* AUTH */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/update-password" element={<UpdatePassword />} />
+
+        {/* USUARIO LOGUEADO */}
         <Route
           path="/profile"
           element={
@@ -29,23 +35,24 @@ function App() {
         />
 
         <Route
-          path="/dashboard"
+          path="/dashboardUser"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <DashboardUser />
             </ProtectedRoute>
           }
         />
+
+        {/* solo ADMIN */}
         <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
+          path="/admin-test"
+          element={
+            <ProtectedRoute role="admin">
+              <DashboardAdmin />
+            </ProtectedRoute>
+          }
         />
-        
-        <Route
-          path="/update-password"
-          element={<UpdatePassword />}
-        />
-        
+
       </Routes>
     </BrowserRouter>
   );

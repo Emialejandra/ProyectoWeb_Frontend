@@ -144,3 +144,43 @@
     opacity: 1;
   }
 }
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dashboard-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.dashboard-btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-income {
+  background: #22c55e;
+  color: white;
+}
+
+.btn-expense {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-profile {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-logout {
+  background: #64748b;
+  color: white;
+}
