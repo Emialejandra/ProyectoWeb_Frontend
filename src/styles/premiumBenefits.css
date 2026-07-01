@@ -1,0 +1,27 @@
+.premium-container {
+  margin-top: 20px;
+}
+
+.premium-container h2 {
+  color: #6c5ce7;
+  margin-bottom: 15px;
+}
+
+.premium-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.premium-card {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.premium-card:hover {
+  transform: scale(1.05);
+}

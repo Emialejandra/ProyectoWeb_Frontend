@@ -75,7 +75,7 @@ function Pricing() {
 
       <button
         className="back-btn"
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate("/dashboardUser")}
       >
         Volver
       </button>

@@ -8,17 +8,28 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
 
-    console.log("Session ID:", sessionId);
+    if (sessionId) {
+      // 🔥 SIMULAMOS PAGO EXITOSO
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const updatedUser = {
+        ...user,
+        plan: "PRO",
+        is_pro: true,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
 
     setTimeout(() => {
       navigate("/dashboardUser");
-    }, 3000);
-  }, [navigate, searchParams]);
+    }, 1500);
+  }, []);
 
   return (
     <div>
-      <h1>✅ Pago exitoso</h1>
-      <p>Redirigiendo al dashboard...</p>
+      <h2>Pago exitoso ✅</h2>
+      <p>Activando plan PRO...</p>
     </div>
   );
 }

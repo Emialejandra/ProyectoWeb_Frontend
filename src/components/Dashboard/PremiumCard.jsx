@@ -1,20 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../../styles/premiumCard.css";
 
 function PremiumCard() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
-//Temporal
-  console.log("API_URL =", import.meta.env.VITE_API_URL);
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   const handleCheckout = async () => {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token"); // si tienes auth
+      const token = localStorage.getItem("token");
 
       const res = await fetch(
         `${API_URL}/api/payments/create-checkout-session`,
@@ -29,19 +26,25 @@ function PremiumCard() {
 
       const data = await res.json();
 
-      if (data?.url) {
-        window.location.href = data.url; // 👉 Stripe checkout
+      console.log("Respuesta backend:", data);
+
+      const checkoutUrl = data?.data?.url;
+
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
       } else {
         console.error("No se recibió URL de Stripe");
+        alert("No se pudo iniciar el checkout");
       }
     } catch (error) {
       console.error("Error en checkout:", error);
+      alert("Error al procesar el pago");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+return (
     <div className="dashboard-card premium-card">
 
       <h3>IA Financiera 🤖</h3>
@@ -61,5 +64,6 @@ function PremiumCard() {
     </div>
   );
 }
+
 
 export default PremiumCard;
