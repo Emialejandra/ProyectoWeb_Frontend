@@ -12,6 +12,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import RegisterIncomeModal from "../../components/Income/RegisterIncomeModal";
 import RegisterExpenseModal from "../../components/Expense/RegisterExpenseModal";
 import ProfileModal from "../../components/Profile/ProfileModal";
+import PremiumBenefits from "../../components/Dashboard/PremiumBenefits";
 
 // services 
 import { getDashboardData } from "../../services/dashboardService";
@@ -68,6 +69,9 @@ function DashboardUser() {
         navigate("/");
         return;
       }
+
+      //temporal 
+      console.log("PROFILE DASHBOARD:", JSON.stringify(user, null, 2));
 
       setProfile(user);
 
@@ -212,8 +216,12 @@ function DashboardUser() {
           getCategoryTotal={getCategoryTotal}
         />
 
-        {/* PREMIUM CARD */}
-        <PremiumCard />
+        {/* SECCIÓN PREMIUM */}
+        {profile?.is_pro || profile?.plan === "PRO" ? (
+          <PremiumBenefits />
+        ) : (
+          <PremiumCard />
+        )}
 
         {/* Modal del perfil*/}
         <ProfileModal

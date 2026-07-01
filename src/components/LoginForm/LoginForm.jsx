@@ -38,6 +38,10 @@ function LoginForm() {
 
       console.log("LOGIN RESPONSE:", data);
 
+      console.log("LOGIN RESPONSE:", data);
+
+      console.log("USER:", JSON.stringify(data.data.user, null, 2));
+      console.log("PROFILE:", JSON.stringify(data.data.profile, null, 2));
 
       if (!response.ok) {
         throw new Error(data.message || "Credenciales inválidas");
