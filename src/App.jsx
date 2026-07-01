@@ -9,6 +9,9 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import UpdatePassword from "./pages/Auth/UpdatePassword";
 import Landing from "./pages/Landing/Landing";
 import DashboardAdmin from "./pages/Dashboard/DashboardAdmin";
+import Pricing from "./pages/Pricing/Pricing";
+import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel/PaymentCancel";
 
 function App() {
   return (
@@ -52,6 +55,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* PAGOS */}
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />    
 
       </Routes>
     </BrowserRouter>

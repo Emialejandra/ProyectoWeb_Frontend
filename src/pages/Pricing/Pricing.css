@@ -1,0 +1,77 @@
+.pricing-container {
+    width: 100%;
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding: 40px;
+    text-align: center;
+}
+
+.pricing-container h1 {
+    margin-bottom: 40px;
+}
+
+.plans{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    flex-wrap:wrap;
+}
+
+.plan{
+    width:340px;
+    background:white;
+    border-radius:15px;
+    padding:30px;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.plan ul{
+    list-style:none;
+    padding:0;
+    margin:30px 0;
+}
+
+.plan li{
+    margin-bottom:15px;
+    text-align:left;
+}
+
+.free{
+    border-top:8px solid #888;
+}
+
+.pro{
+    border-top:8px solid #4CAF50;
+    position:relative;
+}
+
+.badge{
+    position:absolute;
+    top:-15px;
+    right:20px;
+    background:#4CAF50;
+    color:white;
+    padding:5px 15px;
+    border-radius:30px;
+}
+
+.plan button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    background:#4CAF50;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.plan button:hover{
+    background:#43a047;
+}
+
+.back-btn{
+    margin-top:30px;
+    padding:10px 25px;
+    
+}

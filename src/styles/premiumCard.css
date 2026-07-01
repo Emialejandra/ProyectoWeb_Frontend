@@ -1,0 +1,31 @@
+.premium-card {
+  background: linear-gradient(35deg, #d7e0f2, #dae5f4);
+  border: 1px solid rgba(148, 148, 146, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-top: 24px;
+}
+
+.premium-card h3 {
+  color: rgb(0, 0, 0);
+}
+
+.premium-card p {
+  color: black;
+  opacity: 0.80;
+}
+
+.premium-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.08),
+    transparent 60%
+  );
+  transform: rotate(25deg);
+}
