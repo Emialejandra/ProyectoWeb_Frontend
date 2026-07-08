@@ -13,12 +13,13 @@ import RegisterIncomeModal from "../../components/Income/RegisterIncomeModal";
 import RegisterExpenseModal from "../../components/Expense/RegisterExpenseModal";
 import ProfileModal from "../../components/Profile/ProfileModal";
 import PremiumBenefits from "../../components/Dashboard/PremiumBenefits";
+import IAChat from "../../components/IAChat/IAChat";
 
 // services 
 import { getDashboardData } from "../../services/dashboardService";
 import { createIncome } from "../../services/incomeService";
 import { createExpense } from "../../services/expenseService";
-
+import { sendAIMessage } from "../../services/iaService";
 function DashboardUser() {
   const navigate = useNavigate();
 
@@ -202,19 +203,45 @@ function DashboardUser() {
 
           </div>
         </div>
+        <div className="dashboard-main">
 
-        {/* SUMMARY */}
-        <SummaryCards
-          totalExpenses={totalExpenses}
-          totalIncomes={totalIncomes}
-          balance={balance}
-        />
+          <div className="dashboard-left">
 
-        {/* categorias */}
+            {/* SUMMARY */}
+            <SummaryCards
+              totalExpenses={totalExpenses}
+              totalIncomes={totalIncomes}
+              balance={balance}
+
+
+            />
+{/* categorias */}
         <CategoryCards
           categories={categories}
           getCategoryTotal={getCategoryTotal}
         />
+
+          </div>
+
+          {/* CHAT IA */}
+
+          {
+            profile?.plan === "PRO" &&
+            profile?.is_pro === true &&
+            (
+
+              <div className="dashboard-ai">
+
+                <IAChat />
+
+              </div>
+
+            )
+          }
+
+        </div>
+
+        
 
         {/* SECCIÓN PREMIUM */}
         {profile?.is_pro || profile?.plan === "PRO" ? (

@@ -3,7 +3,7 @@
 }
 
 .premium-container h2 {
-  color: #6c5ce7;
+  color: #7a6cea;
   margin-bottom: 15px;
 }
 
@@ -14,7 +14,7 @@
 }
 
 .premium-card {
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  background: linear-gradient(135deg, #a07fda, #bc9bfe);
   color: white;
   padding: 15px;
   border-radius: 12px;
