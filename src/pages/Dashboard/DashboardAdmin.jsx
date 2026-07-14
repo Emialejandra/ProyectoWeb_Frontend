@@ -21,10 +21,10 @@ export default function DashboardAdmin() {
   const [profileStats, setProfileStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [updatingUserId, setUpdatingUserId] = useState(null);
 
-  // =========================
-  // AUTH FETCH
-  // =========================
+  // PETICIONES AUTENTICADAS
+
   const authFetch = async (url, options = {}) => {
     const token = localStorage.getItem("token");
 
@@ -38,48 +38,70 @@ export default function DashboardAdmin() {
     });
 
     if (res.status === 401) {
-      alert("Sesión expirada");
+      alert("Tu sesión ha expirado.");
       localStorage.clear();
       window.location.href = "/";
       return null;
     }
 
+    if (res.status === 403) {
+      throw new Error(
+        "No tienes permisos para realizar esta acción."
+      );
+    }
+
     return res;
   };
 
-  // =========================
-  // PARSE RESPONSE
-  // =========================
+  // PROCESAR RESPUESTAS
+
   const parse = async (res) => {
     if (!res) return null;
 
-    const data = await res.json();
+    let data = null;
+
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
 
     if (!res.ok) {
-      throw new Error(data.message || "Error en la API");
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          "Ocurrió un error al consumir la API."
+      );
     }
 
     return data?.data ?? data;
   };
 
-  // =========================
-  // FETCH USERS
-  // =========================
+  // OBTENER USUARIOS
+
   const fetchUsers = async () => {
     try {
-      const res = await authFetch(`${API_URL}/api/admin/users`);
+      const res = await authFetch(
+        `${API_URL}/api/admin/users`
+      );
+
       const data = await parse(res);
 
-      setUsers(Array.isArray(data) ? data : data?.users || []);
+      setUsers(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.users)
+            ? data.users
+            : []
+      );
     } catch (err) {
-      console.error("Error usuarios:", err);
+      console.error("Error al obtener usuarios:", err);
       setUsers([]);
     }
   };
 
-  // =========================
-  // FETCH PROFILE STATS
-  // =========================
+  // OBTENER ESTADÍSTICAS
+
   const fetchProfileStats = async () => {
     try {
       const res = await authFetch(
@@ -90,14 +112,17 @@ export default function DashboardAdmin() {
 
       setProfileStats(data);
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Error al obtener estadísticas de perfiles:",
+        err
+      );
+
       setProfileStats(null);
     }
   };
 
-  // =========================
-  // FETCH CATEGORIES
-  // =========================
+  // OBTENER CATEGORÍAS
+
   const fetchCategories = async () => {
     try {
       const res = await authFetch(
@@ -106,9 +131,19 @@ export default function DashboardAdmin() {
 
       const data = await parse(res);
 
-      setCategories(Array.isArray(data) ? data : []);
+      setCategories(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.categories)
+            ? data.categories
+            : []
+      );
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Error al obtener categorías:",
+        err
+      );
+
       setCategories([]);
     }
   };
@@ -125,20 +160,20 @@ export default function DashboardAdmin() {
     fetchAll();
   }, []);
 
-  // =========================
-  // ACCIONES
-  // =========================
+  // ELIMINAR USUARIO
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (user) => {
     const confirmDelete = window.confirm(
-      "¿Seguro que deseas eliminar este usuario?"
+      `¿Seguro que deseas eliminar al usuario ${user.email}?`
     );
 
     if (!confirmDelete) return;
 
     try {
+      setUpdatingUserId(user.id);
+
       const res = await authFetch(
-        `${API_URL}/api/admin/users/${id}`,
+        `${API_URL}/api/admin/users/${user.id}`,
         {
           method: "DELETE",
         }
@@ -146,18 +181,31 @@ export default function DashboardAdmin() {
 
       await parse(res);
 
-      alert("Usuario eliminado");
-      fetchUsers();
+      alert("Usuario eliminado correctamente.");
+
+      await fetchAll();
     } catch (err) {
-      console.error(err);
+      console.error("Error al eliminar usuario:", err);
       alert(err.message);
+    } finally {
+      setUpdatingUserId(null);
     }
   };
 
+  // CAMBIAR ROL
+
   const handleToggleRole = async (user) => {
+    const newRole =
+      user.role === "admin" ? "user" : "admin";
+
+    const confirmChange = window.confirm(
+      `¿Deseas cambiar el rol de ${user.email} a ${newRole}?`
+    );
+
+    if (!confirmChange) return;
+
     try {
-      const newRole =
-        user.role === "admin" ? "user" : "admin";
+      setUpdatingUserId(user.id);
 
       const res = await authFetch(
         `${API_URL}/api/admin/users/${user.id}/role`,
@@ -171,52 +219,101 @@ export default function DashboardAdmin() {
 
       await parse(res);
 
-      alert(`Rol actualizado a ${newRole}`);
-      fetchUsers();
+      alert(`Rol actualizado correctamente a ${newRole}.`);
+
+      await fetchUsers();
     } catch (err) {
-      console.error(err);
+      console.error("Error al cambiar rol:", err);
       alert(err.message);
+    } finally {
+      setUpdatingUserId(null);
     }
   };
 
+  // ACTIVAR O DESACTIVAR
+
   const handleToggleStatus = async (user) => {
+    const currentStatus = Boolean(user.is_active);
+    const newStatus = !currentStatus;
+
+    const action = newStatus
+      ? "activar"
+      : "desactivar";
+
+    const confirmChange = window.confirm(
+      `¿Seguro que deseas ${action} al usuario ${user.email}?`
+    );
+
+    if (!confirmChange) return;
+
     try {
+      setUpdatingUserId(user.id);
+
       const res = await authFetch(
         `${API_URL}/api/admin/users/${user.id}/status`,
         {
           method: "PUT",
+          body: JSON.stringify({
+            is_active: newStatus,
+          }),
         }
       );
 
       await parse(res);
 
-      alert("Estado actualizado");
-      fetchUsers();
+      setUsers((previousUsers) =>
+        previousUsers.map((currentUser) =>
+          currentUser.id === user.id
+            ? {
+                ...currentUser,
+                is_active: newStatus,
+              }
+            : currentUser
+        )
+      );
+
+      alert(
+        newStatus
+          ? "Usuario activado correctamente."
+          : "Usuario desactivado correctamente."
+      );
+
+      await fetchUsers();
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Error al cambiar estado:",
+        err
+      );
+
       alert(err.message);
+    } finally {
+      setUpdatingUserId(null);
     }
   };
 
-  // =========================
-  // USER INFO
-  // =========================
+  // INFORMACIÓN DEL ADMIN
 
-  const currentUser = JSON.parse(
-    localStorage.getItem("user") || "{}"
-  );
+  let currentUser = {};
 
-  const safeUsers = Array.isArray(users) ? users : [];
+  try {
+    currentUser = JSON.parse(
+      localStorage.getItem("user") || "{}"
+    );
+  } catch {
+    currentUser = {};
+  }
+
+  const safeUsers = Array.isArray(users)
+    ? users
+    : [];
 
   const totalUsers = safeUsers.length;
 
   const activeUsers = safeUsers.filter(
-    (u) => u.status === "active"
+    (user) => user.is_active === true
   ).length;
 
-  // =========================
-  // LOGOUT
-  // =========================
+  // CERRAR SESIÓN
 
   const handleLogout = () => {
     localStorage.clear();
@@ -228,8 +325,6 @@ export default function DashboardAdmin() {
       {/* SIDEBAR */}
 
       <aside className="sidebar">
-        {/* PERFIL ADMIN */}
-
         <div className="profile-card">
           <div className="profile-avatar">
             {(currentUser.first_name?.[0] || "A") +
@@ -237,9 +332,14 @@ export default function DashboardAdmin() {
           </div>
 
           <div className="profile-info">
-            <h4>{currentUser.first_name || "Administrador"}</h4>
+            <h4>
+              {currentUser.first_name ||
+                "Administrador"}
+            </h4>
 
-            <span>{currentUser.role || "admin"}</span>
+            <span>
+              {currentUser.role || "admin"}
+            </span>
           </div>
         </div>
 
@@ -250,18 +350,26 @@ export default function DashboardAdmin() {
 
         <nav className="sidebar-menu">
           <button
+            type="button"
             className={`menu-item ${
-              activeTab === "dashboard" ? "active" : ""
+              activeTab === "dashboard"
+                ? "active"
+                : ""
             }`}
-            onClick={() => setActiveTab("dashboard")}
+            onClick={() =>
+              setActiveTab("dashboard")
+            }
           >
             <Users size={18} />
             Dashboard
           </button>
 
           <button
+            type="button"
             className={`menu-item ${
-              activeTab === "users" ? "active" : ""
+              activeTab === "users"
+                ? "active"
+                : ""
             }`}
             onClick={() => setActiveTab("users")}
           >
@@ -270,8 +378,11 @@ export default function DashboardAdmin() {
           </button>
 
           <button
+            type="button"
             className={`menu-item ${
-              activeTab === "stats" ? "active" : ""
+              activeTab === "stats"
+                ? "active"
+                : ""
             }`}
             onClick={() => setActiveTab("stats")}
           >
@@ -282,6 +393,7 @@ export default function DashboardAdmin() {
 
         <div className="sidebar-footer">
           <button
+            type="button"
             className="logout-btn"
             onClick={handleLogout}
           >
@@ -291,13 +403,14 @@ export default function DashboardAdmin() {
         </div>
       </aside>
 
-      {/* MAIN */}
+      {/* CONTENIDO PRINCIPAL */}
 
       <main className="dashboard-admin">
         {activeTab === "dashboard" && (
           <div className="stats-grid">
             <div className="card stat-card">
               <Users />
+
               <div>
                 <p>Total usuarios</p>
                 <h3>{totalUsers}</h3>
@@ -306,6 +419,7 @@ export default function DashboardAdmin() {
 
             <div className="card stat-card">
               <UserCheck />
+
               <div>
                 <p>Usuarios activos</p>
                 <h3>{activeUsers}</h3>
@@ -314,24 +428,29 @@ export default function DashboardAdmin() {
 
             <div className="card stat-card">
               <FileCheck />
+
               <div>
                 <p>Perfiles completos</p>
-                <h3>{profileStats?.completed ?? 0}</h3>
+                <h3>
+                  {profileStats?.completed ?? 0}
+                </h3>
               </div>
             </div>
 
             <div className="card stat-card">
               <ShieldAlert />
+
               <div>
                 <p>Incompletos</p>
-                <h3>{profileStats?.incomplete ?? 0}</h3>
+                <h3>
+                  {profileStats?.incomplete ?? 0}
+                </h3>
               </div>
             </div>
-
-            
           </div>
         )}
 
+        {/* TABLA DE USUARIOS */}
 
         {activeTab === "users" && (
           <div className="card users-card">
@@ -339,6 +458,7 @@ export default function DashboardAdmin() {
               <h3>Gestión de usuarios</h3>
 
               <button
+                type="button"
                 onClick={fetchAll}
                 className="btn btn-outline"
               >
@@ -353,65 +473,137 @@ export default function DashboardAdmin() {
                   <th>Nombre</th>
                   <th>Email</th>
                   <th>Rol</th>
-                  <th>Status</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
 
               <tbody>
-                {safeUsers.map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.first_name || u.name}</td>
-                    <td>{u.email}</td>
-                    <td>{u.role}</td>
-                    <td>{u.status || "active"}</td>
-
-                    <td className="actions-cell">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleToggleRole(u)}
-                      >
-                        Rol
-                      </button>
-
-                      <button
-                        className="btn btn-outline"
-                        onClick={() => handleToggleStatus(u)}
-                      >
-                        Estado
-                      </button>
-
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          handleDeleteUser(u.id)
-                        }
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                {safeUsers.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      style={{
+                        textAlign: "center",
+                      }}
+                    >
+                      No existen usuarios registrados.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  safeUsers.map((user) => {
+                    const isUpdating =
+                      updatingUserId === user.id;
+
+                    return (
+                      <tr key={user.id}>
+                        <td>
+                          {user.first_name ||
+                            user.name ||
+                            "Sin nombre"}
+                        </td>
+
+                        <td>{user.email}</td>
+
+                        <td>{user.role}</td>
+
+                        <td>
+                          <span
+                            className={
+                              user.is_active
+                                ? "status-active"
+                                : "status-inactive"
+                            }
+                          >
+                            {user.is_active
+                              ? "Activo"
+                              : "Inactivo"}
+                          </span>
+                        </td>
+
+                        <td className="actions-cell">
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            disabled={isUpdating}
+                            onClick={() =>
+                              handleToggleRole(user)
+                            }
+                          >
+                            {isUpdating
+                              ? "Procesando..."
+                              : "Cambiar rol"}
+                          </button>
+
+                          <button
+                            type="button"
+                            className={
+                              user.is_active
+                                ? "btn btn-danger"
+                                : "btn btn-success"
+                            }
+                            disabled={isUpdating}
+                            onClick={() =>
+                              handleToggleStatus(user)
+                            }
+                          >
+                            {isUpdating
+                              ? "Procesando..."
+                              : user.is_active
+                                ? "Desactivar"
+                                : "Activar"}
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-btn"
+                            disabled={isUpdating}
+                            onClick={() =>
+                              handleDeleteUser(user)
+                            }
+                            title="Eliminar usuario"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
         )}
 
+        {/* ESTADÍSTICAS */}
+
         {activeTab === "stats" && (
           <div className="card">
             <h3>Categorías más utilizadas</h3>
 
-<p>En desarrollo :D</p>
             {categories.length === 0 ? (
               <p>No existen datos.</p>
             ) : (
-              categories.map((cat, index) => (
+              categories.map((category, index) => (
                 <div
-                  key={index}
+                  key={
+                    category.id ||
+                    category.name ||
+                    index
+                  }
                   className="category-item"
                 >
-                  <span>{cat.name}</span>
-                  <span>{cat.count}</span>
+                  <span>
+                    {category.name ||
+                      category.category ||
+                      "Sin categoría"}
+                  </span>
+
+                  <span>
+                    {category.count ??
+                      category.total ??
+                      0}
+                  </span>
                 </div>
               ))
             )}

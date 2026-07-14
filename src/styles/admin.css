@@ -469,15 +469,13 @@ body {
 }
 
 .menu-item:hover {
-  background: rgba(255,255,255,.08);
+  background: rgba(255, 255, 255, .08);
 }
 
 .menu-item.active {
-  background: linear-gradient(
-    90deg,
-    #6059e8,
-    #5b4cf6
-  );
+  background: linear-gradient(90deg,
+      #6059e8,
+      #5b4cf6);
 }
 
 /* PERFIL */
@@ -489,8 +487,8 @@ body {
 }
 
 .profile-card {
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .08);
 
   padding: 14px;
   border-radius: 16px;
@@ -528,7 +526,7 @@ body {
 
 .logout-btn {
   border: none;
-  background: rgba(255,255,255,.08);
+  background: rgba(255, 255, 255, .08);
 
   color: white;
 
@@ -540,7 +538,7 @@ body {
 }
 
 .logout-btn:hover {
-  background: rgba(255,255,255,.15);
+  background: rgba(255, 255, 255, .15);
 }
 
 /* CONTENIDO */
@@ -708,8 +706,56 @@ body {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.status-active,
+.status-inactive {
+  display: inline-block;
+  min-width: 75px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-active {
+  color: #166534;
+  background-color: #dcfce7;
+}
+
+.status-inactive {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+.btn-success {
+  color: white;
+  background-color: #16a34a;
+  border: none;
+}
+
+.btn-success:hover {
+  background-color: #15803d;
+}
+
+.btn-danger {
+  color: white;
+  background-color: #dc2626;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+.btn:disabled,
+.delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
