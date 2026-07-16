@@ -384,18 +384,17 @@ function DashboardUser() {
               <IAChat />
             </div>
           )}
-
-          {/*seccion premium*/}
-          {isPro ? (
-            <PremiumBenefits />
-          ) : (
-            <PremiumCard />
-          )}
-
-          {/* HISTORIAL DE INGRESOS Y GASTOS */}
-          <TransactionHistory />
         </div>
 
+        {/*seccion premium*/}
+        {isPro ? (
+          <PremiumBenefits />
+        ) : (
+          <PremiumCard />
+        )}
+
+        {/* HISTORIAL DE INGRESOS Y GASTOS */}
+        <TransactionHistory />
 
         {/* Modal del perfil*/}
         <ProfileModal
