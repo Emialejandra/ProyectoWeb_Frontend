@@ -1,294 +1,274 @@
-import {useEffect, useRef, useState} from "react";
-import {sendAIMessage} from "../../services/iaService";
+import { useEffect, useRef, useState } from "react";
+import { sendAIMessage } from "../../services/iaService";
 import "./IAChat.css";
 
 
-export default function IAChat(){
+export default function IAChat() {
 
 
-const [messages,setMessages] = useState([]);
+   const [messages, setMessages] = useState([]);
 
-const [input,setInput] = useState("");
+   const [input, setInput] = useState("");
 
-const [mode,setMode] = useState("financial");
+   const mode = "financial";
 
-const [loading,setLoading] = useState(false);
+   const [loading, setLoading] = useState(false);
 
 
-const bottomRef = useRef(null);
+   const bottomRef = useRef(null);
 
 
-const token = localStorage.getItem("token");
+   const token = localStorage.getItem("token");
 
 
 
-useEffect(()=>{
+   useEffect(() => {
 
- bottomRef.current?.scrollIntoView({
-    behavior:"smooth"
- });
+      bottomRef.current?.scrollIntoView({
+         behavior: "smooth"
+      });
 
-},[messages,loading]);
+   }, [messages, loading]);
 
 
 
 
-const handleSend = async()=>{
+   const handleSend = async () => {
 
 
- if(!input.trim() || loading) return;
+      if (!input.trim() || loading) return;
 
 
-const userMessage={
- role:"user",
- content:input
-};
+      const userMessage = {
+         role: "user",
+         content: input
+      };
 
 
-const newMessages=[
- ...messages,
- userMessage
-];
+      const newMessages = [
+         ...messages,
+         userMessage
+      ];
 
 
-setMessages(newMessages);
-setInput("");
-setLoading(true);
+      setMessages(newMessages);
+      setInput("");
+      setLoading(true);
 
 
 
-try{
+      try {
 
 
-const answer = await sendAIMessage(
- token,
- newMessages,
- mode
-);
+         const answer = await sendAIMessage(
+            token,
+            newMessages,
+            mode
+         );
 
 
-setMessages(prev=>[
- ...prev,
- {
- role:"assistant",
- content:answer
- }
-]);
+         setMessages(prev => [
+            ...prev,
+            {
+               role: "assistant",
+               content: answer
+            }
+         ]);
 
 
 
-}catch(error){
+      } catch (error) {
 
 
-if(error.message==="PRO_ONLY"){
+         if (error.message === "PRO_ONLY") {
 
-setMessages(prev=>[
- ...prev,
- {
- role:"assistant",
- content:"Disponible únicamente para usuarios PRO"
- }
-]);
+            setMessages(prev => [
+               ...prev,
+               {
+                  role: "assistant",
+                  content: "Disponible únicamente para usuarios PRO"
+               }
+            ]);
 
-}
+         }
 
 
-else if(error.message==="UNAUTHORIZED"){
+         else if (error.message === "UNAUTHORIZED") {
 
-window.location.href="/login";
+            window.location.href = "/login";
 
-}
+         }
 
 
-else{
+         else {
 
-setMessages(prev=>[
- ...prev,
- {
- role:"assistant",
- content:"Ocurrió un error al comunicarse con la IA"
- }
-]);
+            setMessages(prev => [
+               ...prev,
+               {
+                  role: "assistant",
+                  content: "Ocurrió un error al comunicarse con la IA"
+               }
+            ]);
 
-}
+         }
 
 
-}
+      }
 
 
-finally{
+      finally {
 
-setLoading(false);
+         setLoading(false);
 
-}
+      }
 
 
-};
+   };
 
 
 
 
-const handleKeyDown=(e)=>{
+   const handleKeyDown = (e) => {
 
 
-if(e.key==="Enter" && !e.shiftKey){
+      if (e.key === "Enter" && !e.shiftKey) {
 
- e.preventDefault();
- handleSend();
+         e.preventDefault();
+         handleSend();
 
-}
+      }
 
 
-};
+   };
 
 
 
-const clearChat=()=>{
+   const clearChat = () => {
 
-setMessages([]);
+      setMessages([]);
 
-};
+   };
 
 
 
-return (
+   return (
 
-<div className="ai-chat">
+      <div className="ai-chat">
 
 
-<div className="ai-header">
+         <div className="ai-header">
 
-<h2>
- Asistente IA
-</h2>
+            <h2>
+               Asistente IA
+            </h2>
 
 
-<select
-value={mode}
-onChange={(e)=>setMode(e.target.value)}
->
+            <div className="ai-mode">
+               <span>Asistente Financiero</span>
+            </div>
 
-<option value="financial">
-Financial
-</option>
 
-<option value="web">
-Web
-</option>
+         </div>
 
-<option value="english">
-English
-</option>
 
-<option value="debug">
-Debug
-</option>
 
+         <div className="ai-messages">
 
-</select>
 
+            {
+               messages.map((msg, index) => (
 
-</div>
+                  <div
+                     key={index}
+                     className={
+                        `message ${msg.role}`
+                     }
+                  >
 
+                     <strong>
+                        {
+                           msg.role === "user"
+                              ? "Tú:"
+                              : "IA:"
+                        }
+                     </strong>
 
+                     <p>
+                        {msg.content}
+                     </p>
 
-<div className="ai-messages">
+                  </div>
 
+               ))
+            }
 
-{
-messages.map((msg,index)=>(
 
-<div
-key={index}
-className={
-`message ${msg.role}`
-}
->
+            {
+               loading &&
+               <div className="message assistant">
+                  Pensando...
+               </div>
+            }
 
-<strong>
-{
-msg.role==="user"
-?"Tú:"
-:"IA:"
-}
-</strong>
 
-<p>
-{msg.content}
-</p>
+            <div ref={bottomRef} />
 
-</div>
 
-))
-}
+         </div>
 
 
-{
-loading &&
-<div className="message assistant">
-Pensando...
-</div>
-}
 
+         <textarea
 
-<div ref={bottomRef}/>
+            value={input}
 
+            onChange={
+               (e) => setInput(e.target.value)
+            }
 
-</div>
+            onKeyDown={handleKeyDown}
 
+            placeholder="Escribe tu pregunta..."
 
+            disabled={loading}
 
-<textarea
+         />
 
-value={input}
 
-onChange={
-(e)=>setInput(e.target.value)
-}
 
-onKeyDown={handleKeyDown}
+         <div className="ai-buttons">
 
-placeholder="Escribe tu pregunta..."
 
-disabled={loading}
+            <button
+               onClick={handleSend}
+               disabled={loading}
+            >
 
-/>
+               {
+                  loading
+                     ? "Pensando..."
+                     : "Enviar"
+               }
 
+            </button>
 
 
-<div className="ai-buttons">
+            <button
+               onClick={clearChat}
+            >
 
+               Limpiar
 
-<button
-onClick={handleSend}
-disabled={loading}
->
+            </button>
 
-{
-loading
-?"Pensando..."
-:"Enviar"
-}
 
-</button>
+         </div>
 
 
-<button
-onClick={clearChat}
->
 
-Limpiar
+      </div>
 
-</button>
-
-
-</div>
-
-
-
-</div>
-
-);
+   );
 
 
 }
