@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Profile from "../Profile/Profile";
 import { normalizeUser } from "../../utils/userUtils";
 import "../../styles/dashboard.css";
+import "../../components/Navbar/Navbar.css";
 
-//components
+//COMPONENTES
 import SummaryCards from "../../components/Dashboard/SummaryCards";
 import CategoryCards from "../../components/Dashboard/CategoryCards";
 import PremiumCard from "../../components/Dashboard/PremiumCard";
@@ -16,7 +17,7 @@ import PremiumBenefits from "../../components/Dashboard/PremiumBenefits";
 import IAChat from "../../components/IAChat/IAChat";
 import TransactionHistory from "../../components/History/TransactionHistory";
 
-// services 
+// SERVICIOS
 import { getDashboardData } from "../../services/dashboardService";
 import { createIncome } from "../../services/incomeService";
 import { createExpense } from "../../services/expenseService";
@@ -27,7 +28,7 @@ function DashboardUser() {
   const API_URL =
     import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-  // STATES
+  // ESTADOS
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
 
@@ -55,7 +56,7 @@ function DashboardUser() {
     category: "",
   });
 
-  // LOAD DASHBOARD
+  // DASHBOARD
   useEffect(() => {
     const initializeDashboard = async () => {
       setLoading(true);
@@ -94,7 +95,7 @@ function DashboardUser() {
       return false;
     }
 
-    // No viene desde Google: continuar normalmente
+    // No viene desde Google
     if (!accessToken) {
       return true;
     }
@@ -228,7 +229,6 @@ function DashboardUser() {
         return;
       }
 
-      //temporal 
       console.log("PROFILE DASHBOARD:", JSON.stringify(user, null, 2));
 
       setProfile(user);
@@ -345,7 +345,11 @@ function DashboardUser() {
       <div className="dashboard-container">
         {/* HEADER */}
         <div className="dashboard-header">
-          <h1>Dashboard de Usuario</h1>
+          <h1>
+            {profile
+              ? `Bienvenido, ${profile.first_name}`
+              : "Bienvenido"}
+          </h1>
 
           <div className="dashboard-actions">
             <button
@@ -378,7 +382,10 @@ function DashboardUser() {
             />
           </div>
 
-          {/* CHAT SOLO PARA USUARIOS PRO */}
+          {/* HISTORIAL DE INGRESOS Y GASTOS */}
+          <TransactionHistory />
+
+          {/* CHATB SOLO PARA USUARIOS PRO */}
           {isPro && (
             <div className="dashboard-ai">
               <IAChat />
@@ -392,9 +399,6 @@ function DashboardUser() {
         ) : (
           <PremiumCard />
         )}
-
-        {/* HISTORIAL DE INGRESOS Y GASTOS */}
-        <TransactionHistory />
 
         {/* Modal del perfil*/}
         <ProfileModal

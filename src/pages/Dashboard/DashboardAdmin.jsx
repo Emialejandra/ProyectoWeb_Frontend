@@ -13,6 +13,7 @@ import {
   LogOut,
   Crown,
   X,
+  Menu,
 } from "lucide-react";
 
 import {
@@ -47,6 +48,7 @@ const CHART_COLORS = [
   "#6366f1",
 ];
 
+// ESTADOS 
 export default function DashboardAdmin() {
   const [users, setUsers] = useState([]);
   const [profileStats, setProfileStats] = useState(null);
@@ -56,9 +58,9 @@ export default function DashboardAdmin() {
   const [loading, setLoading] = useState(true);
   const [showAdminProfile, setShowAdminProfile] =
     useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // PETICIONES AUTENTICADAS
-
   const authFetch = async (url, options = {}) => {
     const token = localStorage.getItem("token");
 
@@ -547,21 +549,49 @@ export default function DashboardAdmin() {
   // CERRAR SESIÓN
 
   const handleLogout = () => {
+    setSidebarOpen(false);
     localStorage.clear();
     window.location.href = "/";
   };
 
+  const handleMenuNavigation = (tab) => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="admin-layout">
+      {/* BOTÓN HAMBURGUESA */}
+      <button
+        type="button"
+        className="admin-menu-toggle"
+        onClick={() => setSidebarOpen((prev) => !prev)}
+        aria-label={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
+        aria-expanded={sidebarOpen}
+      >
+        {sidebarOpen ? <X size={25} /> : <Menu size={25} />}
+      </button>
+
+      {/* FONDO OSCURO RESPONSIVE */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Cerrar menú lateral"
+        />
+      )}
+
       {/* SIDEBAR */}
-
-      <aside className="sidebar">
-        {/* PERFIL CLICKEABLE */}
-
+      <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
+        {/* PERFIL DEL ADMINISTRADOR */}
         <button
           type="button"
           className="profile-card profile-card-button"
-          onClick={() => setShowAdminProfile(true)}
+          onClick={() => {
+            setShowAdminProfile(true);
+            setSidebarOpen(false);
+          }}
           title="Ver perfil del administrador"
         >
           <div className="profile-avatar">
@@ -591,13 +621,9 @@ export default function DashboardAdmin() {
         <nav className="sidebar-menu">
           <button
             type="button"
-            className={`menu-item ${activeTab === "dashboard"
-                ? "active"
-                : ""
+            className={`menu-item ${activeTab === "dashboard" ? "active" : ""
               }`}
-            onClick={() =>
-              setActiveTab("dashboard")
-            }
+            onClick={() => handleMenuNavigation("dashboard")}
           >
             <Users size={18} />
             Dashboard
@@ -605,13 +631,9 @@ export default function DashboardAdmin() {
 
           <button
             type="button"
-            className={`menu-item ${activeTab === "users"
-                ? "active"
-                : ""
+            className={`menu-item ${activeTab === "users" ? "active" : ""
               }`}
-            onClick={() =>
-              setActiveTab("users")
-            }
+            onClick={() => handleMenuNavigation("users")}
           >
             <BarChart3 size={18} />
             Usuarios
@@ -619,13 +641,9 @@ export default function DashboardAdmin() {
 
           <button
             type="button"
-            className={`menu-item ${activeTab === "stats"
-                ? "active"
-                : ""
+            className={`menu-item ${activeTab === "stats" ? "active" : ""
               }`}
-            onClick={() =>
-              setActiveTab("stats")
-            }
+            onClick={() => handleMenuNavigation("stats")}
           >
             <Tags size={18} />
             Estadísticas
@@ -645,7 +663,6 @@ export default function DashboardAdmin() {
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
-
       <main className="dashboard-admin">
         {loading ? (
           <div className="admin-loading">
@@ -922,9 +939,7 @@ export default function DashboardAdmin() {
                         <button
                           type="button"
                           className="dashboard-view-users"
-                          onClick={() =>
-                            setActiveTab("users")
-                          }
+                          onClick={() => handleMenuNavigation("users")}
                         >
                           Ver todos los usuarios
                         </button>

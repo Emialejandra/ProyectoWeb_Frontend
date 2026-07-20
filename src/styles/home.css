@@ -1,90 +1,193 @@
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-  font-family:'Segoe UI', sans-serif;
-  background:#f5f7fb;
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
 }
 
-.home-container{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:40px;
-  padding:20px 5%;
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f7fb;
+}
+
+/* Contenedor principal */
+.home-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding: 40px 5%;
+  overflow-x: hidden;
 }
 
 /* Lado izquierdo */
-.home-left{
-  flex:1;
-  max-width:600px;
+.home-left {
+  flex: 1;
+  width: 100%;
+  max-width: 600px;
 }
 
-.home-left h1{
-  color:#14b8a6;
-  font-size:3.2rem;
-  margin-bottom:8px;
+.home-left h1 {
+  color: #14b8a6;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+  margin-bottom: 8px;
 }
 
-.home-left h2{
-  color:#0f172a;
-  font-size:1.8rem;
-  margin-bottom:15px;
+.home-left h2 {
+  color: #0f172a;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  line-height: 1.3;
+  margin-bottom: 15px;
 }
 
-.home-left p{
-  color:#475569;
-  font-size:1.05rem;
-  line-height:1.6;
-  margin-bottom:20px;
+.home-left p {
+  color: #475569;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  max-width: 550px;
 }
 
 /* Imagen */
-.home-image{
-  width:100%;
-  max-width:450px;
-  display:block;
+.home-image {
+  display: block;
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  object-fit: contain;
 }
 
-/* Login */
-.home-right{
-  width:420px;
-  flex-shrink:0;
+/* Lado del formulario */
+.home-right {
+  width: 100%;
+  max-width: 420px;
+  flex-shrink: 0;
 }
 
-/* Responsive */
-@media(max-width:900px){
-
-  .home-container{
-    flex-direction:column;
-    text-align:center;
-    gap:25px;
-    padding:25px;
+/* Pantallas medianas */
+@media (max-width: 1100px) {
+  .home-container {
+    gap: 35px;
+    padding: 35px 4%;
   }
 
-  .home-left{
-    max-width:100%;
+  .home-left {
+    max-width: 520px;
   }
 
-  .home-left h1{
-    font-size:2.5rem;
+  .home-right {
+    max-width: 390px;
   }
 
-  .home-left h2{
-    font-size:1.5rem;
+  .home-image {
+    max-width: 400px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+  .home-container {
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 40px 25px;
+    text-align: center;
   }
 
-  .home-image{
-    margin:auto;
-    max-width:320px;
+  .home-left {
+    max-width: 650px;
   }
 
-  .home-right{
-    width:100%;
-    max-width:420px;
+  .home-left p {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .home-image {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  .home-right {
+    width: 100%;
+    max-width: 450px;
+  }
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+  .home-container {
+    justify-content: flex-start;
+    gap: 22px;
+    padding: 30px 16px;
+  }
+
+  .home-left h1 {
+    font-size: 2.1rem;
+  }
+
+  .home-left h2 {
+    font-size: 1.35rem;
+  }
+
+  .home-left p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+
+  .home-image {
+    max-width: 280px;
+  }
+
+  .home-right {
+    max-width: 100%;
+  }
+}
+
+/* Celulares pequeños */
+@media (max-width: 400px) {
+  .home-container {
+    padding: 24px 12px;
+    gap: 18px;
+  }
+
+  .home-left h1 {
+    font-size: 1.8rem;
+  }
+
+  .home-left h2 {
+    font-size: 1.2rem;
+  }
+
+  .home-left p {
+    font-size: 0.9rem;
+  }
+
+  .home-image {
+    max-width: 230px;
+  }
+}
+
+/* Pantallas con poca altura */
+@media (max-height: 700px) and (min-width: 901px) {
+  .home-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .home-image {
+    max-height: 300px;
   }
 }

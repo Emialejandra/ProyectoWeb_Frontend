@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { normalizeUser } from "../../utils/userUtils";
 import { getFriendlyError } from "../../utils/errorMessages";
 import "../../styles/profile.css";
-// IMPORTAMOS LOS ICONOS PARA EL OJO
+import Navbar from "../../components/Navbar/Navbar.jsx";
+import "../../components/Navbar/Navbar.css";
+import "../../styles/landing.css";
+
+// Import para el icono 
 import { Eye, EyeOff } from "lucide-react";
 
 function Profile({ onClose }) {
@@ -39,10 +43,9 @@ function Profile({ onClose }) {
     categories: []
   });
 
+  // ESTADOS
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  // NUEVOS ESTADOS PARA MOSTRAR/OCULTAR CONTRASEÑAS
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -240,7 +243,7 @@ function Profile({ onClose }) {
 
       setTimeout(() => {
         if (onClose) {
-          onClose(); // cierra el modal y actualiza el dashboard
+          onClose(); 
         } else {
           navigate("/dashboardUser");
         }
@@ -328,7 +331,10 @@ function Profile({ onClose }) {
   }
 
   return (
+    <>
+    <Navbar />
     <div className="profile-container">
+      
       <h1>Mi Perfil</h1>
 
       {successMessage && <div className="toast-success">{successMessage}</div>}
@@ -461,6 +467,7 @@ function Profile({ onClose }) {
         </button>
       </div>
     </div>
+    </>
   );
 }
 

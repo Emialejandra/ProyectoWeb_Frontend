@@ -4,63 +4,183 @@
   box-sizing: border-box;
 }
 
-.landing {
-  min-height: 90vh;
-  background: #f5f7fb;
-  font-family: 'Segoe UI', sans-serif;
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
 }
 
-/* HERO */
+body {
+  overflow-x: hidden;
+}
+
+.landing {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+/* HEADER*/
+
+.landing-header {
+  width: 100%;
+  min-height: 80px;
+  padding: 16px 5%;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  min-width: 0;
+}
+
+.logo h2 {
+  color: #14b8a6;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nav-buttons a {
+  text-decoration: none;
+}
+
+/* Botón Login */
+.btn-login-header {
+  min-height: 42px;
+  background: transparent;
+  color: #14b8a6;
+  border: 2px solid #14b8a6;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.btn-login-header:hover {
+  background: #14b8a6;
+  color: white;
+}
+
+/* Botón Register */
+.btn-register-header {
+  min-height: 42px;
+  background: #14b8a6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.btn-register-header:hover {
+  background: #0f9b8a;
+}
+
+/* HERO*/
+
 .hero {
-  min-height: calc(100vh - 90px);
+  width: 100%;
+  min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 80px;
-  padding: 0 8%;
+  gap: 60px;
+  padding: 60px 8%;
   background: #f8fafc;
 }
 
 .hero-content {
   flex: 1;
+  min-width: 0;
   max-width: 600px;
 }
 
 .hero-content h1 {
-  font-size: 5rem;
+  font-size: clamp(3rem, 7vw, 5rem);
   font-weight: 800;
   color: #14b8a6;
   line-height: 1.1;
   margin-bottom: 20px;
+  overflow-wrap: anywhere;
 }
 
 .hero-content p {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: #475569;
   line-height: 1.8;
   margin-bottom: 30px;
 }
 
-/* SECCIONES */
+.carousel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  max-width: 650px;
+  height: clamp(280px, 35vw, 400px);
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.15);
+  transition: all 0.5s ease;
+}
+
+/* SECCIONES*/
+
 .section {
+  width: 100%;
   padding: 80px 5%;
 }
 
 .section-title {
   text-align: center;
   color: #0f172a;
-  font-size: 2rem;
+  font-size: clamp(1.7rem, 4vw, 2rem);
   margin-bottom: 50px;
+  line-height: 1.3;
 }
 
-/* TARJETAS */
+/* TARJETAS*/
+
 .cards {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 25px;
 }
 
 .card {
+  min-width: 0;
   background: white;
   padding: 30px;
   border-radius: 15px;
@@ -75,155 +195,26 @@
 .card h3 {
   color: #14b8a6;
   margin-bottom: 15px;
+  font-size: 1.2rem;
 }
 
 .card p {
   color: #475569;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
-/* FOOTER */
-.footer {
-  text-align: center;
-  padding: 25px;
-  background: #0f172a;
-  color: white;
-  border-top: 2px solid #a6c6c2;
-}
-
-
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  .hero {
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
-    gap: 40px;
-    padding: 40px 5%;
-  }
-
-  .hero-content {
-    max-width: 100%;
-  }
-
-  .hero-content h1 {
-    font-size: 2.8rem;
-  }
-
-  .hero-content h2 {
-    font-size: 1.6rem;
-  }
-
-  .hero-content p {
-    font-size: 1rem;
-  }
-
-  .hero-image {
-    max-width: 380px;
-  }
-}
-
-/* HEADER */
-.landing-header {
-  width: 100%;
-  padding: 20px 5%;
-  background: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo h2 {
-  color: #14b8a6;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-/* Botón Login */
-.btn-login-header {
-  background: transparent;
-  color: #14b8a6;
-  border: 2px solid #14b8a6;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.btn-login-header:hover {
-  background: #14b8a6;
-  color: white;
-}
-
-/* Botón Register */
-.btn-register-header {
-  background: #14b8a6;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.btn-register-header:hover {
-  background: #0f9b8a;
-}
-
-@media (max-width: 768px) {
-  .landing-header {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-  }
-
-  .nav-buttons {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-}
-
-.carousel {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-}
-
-.hero-image {
-  width: 100%;
-  max-width: 650px;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.15);
-  transition: all 0.5s ease;
-}
-
-.carousel-btn:hover {
-  background: #0f9b8a;
-}
+/* PROCESO*/
 
 .steps {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 25px;
 }
 
 .step {
+  min-width: 0;
   background: white;
   padding: 30px;
   border-radius: 15px;
@@ -244,27 +235,44 @@
   margin-bottom: 15px;
 }
 
+.step h3 {
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.step p {
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* ESTADÍSTICAS*/
+
 .stats {
+  width: 100%;
   background: #14b8a6;
   color: white;
-  display: flex;
-  justify-content: center;
-  gap: 80px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 30px;
   padding: 60px 5%;
-  flex-wrap: wrap;
 }
 
 .stat {
+  min-width: 0;
   text-align: center;
 }
 
 .stat h2 {
-  font-size: 3rem;
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  overflow-wrap: anywhere;
 }
 
 .stat p {
   margin-top: 10px;
+  line-height: 1.4;
 }
+
+/* INTELIGENCIA ARTIFICIAL*/
 
 .ai-section {
   background: white;
@@ -272,21 +280,28 @@
 }
 
 .ai-content {
+  width: 100%;
   max-width: 900px;
   margin: auto;
 }
 
 .ai-content h2 {
   color: #14b8a6;
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
   margin-bottom: 20px;
+  line-height: 1.3;
 }
 
 .ai-content p {
   color: #475569;
   line-height: 1.8;
+  font-size: 1rem;
 }
 
+/* LLAMADO A LA ACCIÓN*/
+
 .cta {
+  width: 100%;
   background: #0f172a;
   color: white;
   text-align: center;
@@ -295,11 +310,310 @@
 
 .cta h2 {
   margin-bottom: 20px;
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  line-height: 1.3;
 }
 
 .cta p {
   max-width: 700px;
-  margin: auto auto 30px;
+  margin: 0 auto 30px;
   color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.cta a {
+  text-decoration: none;
+}
+
+/* FOOTER*/
+
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 25px 5%;
+  background: #0f172a;
+  color: white;
+  border-top: 2px solid #a6c6c2;
+  line-height: 1.5;
+}
+
+/* LAPTOPS PEQUEÑAS*/
+
+@media (max-width: 1100px) {
+  .hero {
+    gap: 40px;
+    padding: 50px 5%;
+  }
+
+  .cards,
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-image {
+    max-width: 520px;
+  }
+}
+
+/* TABLETS*/
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 35px;
+    padding: 60px 5%;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .hero-content h1 {
+    font-size: 3.4rem;
+  }
+
+  .hero-content p {
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .carousel {
+    width: 100%;
+  }
+
+  .hero-image {
+    max-width: 600px;
+    height: 360px;
+  }
+
+  .section {
+    padding: 65px 5%;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* TABLETS PEQUEÑAS*/
+
+@media (max-width: 768px) {
+  .landing-header {
+    min-height: auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .logo {
+    width: 100%;
+    text-align: center;
+  }
+
+  .logo h2 {
+    font-size: 1.5rem;
+  }
+
+  .nav-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .section-title {
+    margin-bottom: 35px;
+  }
+
+  .card,
+  .step {
+    padding: 24px;
+  }
+
+  .cta {
+    padding: 75px 5%;
+  }
+}
+
+/* CELULARES*/
+
+@media (max-width: 600px) {
+  .landing-header {
+    position: relative;
+  }
+
+  .logo h2 {
+    font-size: 1.25rem;
+  }
+
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .nav-buttons a {
+    width: 100%;
+  }
+
+  .btn-login-header,
+  .btn-register-header {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    gap: 25px;
+    padding: 45px 16px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.6rem;
+    margin-bottom: 15px;
+  }
+
+  .hero-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+
+  .hero-image {
+    max-width: 100%;
+    height: 260px;
+    border-radius: 14px;
+  }
+
+  .section {
+    padding: 50px 16px;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+  }
+
+  .cards,
+  .steps,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .cards,
+  .steps {
+    gap: 18px;
+  }
+
+  .card,
+  .step {
+    padding: 22px 18px;
+  }
+
+  .stats {
+    gap: 35px;
+    padding: 50px 16px;
+  }
+
+  .stat h2 {
+    font-size: 2.3rem;
+  }
+
+  .ai-content h2 {
+    font-size: 1.65rem;
+  }
+
+  .ai-content p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .cta {
+    padding: 65px 16px;
+  }
+
+  .cta h2 {
+    font-size: 1.8rem;
+  }
+
+  .cta p {
+    font-size: 0.95rem;
+  }
+
+  .cta .btn-register-header {
+    width: auto;
+    min-width: 200px;
+  }
+
+  .footer {
+    padding: 22px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* CELULARES PEQUEÑOS*/
+
+@media (max-width: 380px) {
+  .landing-header {
+    padding: 14px 10px;
+  }
+
+  .logo h2 {
+    font-size: 1.1rem;
+  }
+
+  .nav-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 35px 12px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.15rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .hero-image {
+    height: 220px;
+  }
+
+  .section {
+    padding: 42px 12px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .card,
+  .step {
+    padding: 20px 15px;
+  }
+
+  .stats {
+    padding: 45px 12px;
+  }
+
+  .cta {
+    padding: 55px 12px;
+  }
+
+  .cta h2 {
+    font-size: 1.55rem;
+  }
+
+  .cta .btn-register-header {
+    width: 100%;
+    min-width: 0;
+  }
 }
